@@ -28,13 +28,13 @@ if (typeof $response === "undefined") {
     deleteHeader(headers, "x-rc-last-refresh-time");
     $done({ headers });
 } else {
+
     const url = $request && $request.url ? $request.url : "";
 
     if (/\/offerings(?:[/?#]|$)/.test(url) || !$response.body) {
         $done({});
     } else {
         let obj;
-
         try {
             obj = JSON.parse($response.body);
         } catch {
@@ -42,6 +42,11 @@ if (typeof $response === "undefined") {
         }
 
         const purchaseDate = rcDateFromRequestTime($response.headers);
+        
+
+        const headers = $response.headers || {};
+        deleteHeader(headers, "x-signature");
+        deleteHeader(headers, "x-revenuecat-etag");
 
         obj.subscriber = {
             non_subscriptions: {},
@@ -56,11 +61,19 @@ if (typeof $response === "undefined") {
             },
             management_url: null,
             subscriptions: {},
-            entitlements: {},
+            entitlements: {
+                [productName]: {
+                    grace_period_expires_date: null,
+                    purchase_date: purchaseDate,
+                    product_identifier: productType,
+                    expires_date: null
+                }
+            },
             original_purchase_date: purchaseDate,
             original_app_user_id: "$RCAnonymousID:0400000000000000000000000000000",
             last_seen: purchaseDate
         };
+
 
         obj.subscriber.non_subscriptions[productType] = [{
             id: "aaaaaaaaaa",
@@ -73,13 +86,7 @@ if (typeof $response === "undefined") {
             store_transaction_id: "280000000000000"
         }];
 
-        obj.subscriber.entitlements[productName] = {
-            grace_period_expires_date: null,
-            purchase_date: purchaseDate,
-            product_identifier: productType,
-            expires_date: null
-        };
 
-        $done({ body: JSON.stringify(obj) });
+        $done({ headers, body: JSON.stringify(obj) });
     }
 }
