@@ -1,4 +1,4 @@
-const targetBundleId = "com.scripting.ios";
+const targetBundleId = "dev.fuxiao.app.Hamster";
 
 function getHeader(headers, name) {
     if (!headers) return null;
