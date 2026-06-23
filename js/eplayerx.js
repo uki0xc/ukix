@@ -1,5 +1,5 @@
 const productName = "Subscription";
-const productType = "com.snowlee.eplayerx.lifetime";
+const productType = "ai.suno.premier.annual";
 const appVersion = null;
 
 function headerValue(headers, name) {
